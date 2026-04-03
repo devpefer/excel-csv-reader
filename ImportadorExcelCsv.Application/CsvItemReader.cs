@@ -1,33 +1,19 @@
-﻿using ClosedXML.Excel;
-using ImportadorExcelCsv.Domain.Enums;
+﻿using ImportadorExcelCsv.Domain.Enums;
 using ImportadorExcelCsv.Domain.Interfaces;
 using ImportadorExcelCsv.Items;
 
 namespace ImportadorExcelCsv.Application;
 
-public class ExcelItemReader : IItemReader
+public class CsvItemReader : IItemReader
 {
   public List<Item> Read(string filePath, bool hasHeader)
   {
     List<Item> items = [];
-    using XLWorkbook workbook = new XLWorkbook(filePath);
-    IXLWorksheet worksheet = workbook.Worksheet(1);
-    bool isFirstRow = true;
-    
-    foreach (IXLRow row in worksheet.RowsUsed())
-    {
-      if (hasHeader && isFirstRow)
-      {
-        isFirstRow = false;
-        continue;
-      }
-      items.Add(GetItem(row));
-    }
 
     return items;
   }
 
-  private Item GetItem(IXLRow row)
+  private Item GetItem()
   {
     return Item.Create
     (
