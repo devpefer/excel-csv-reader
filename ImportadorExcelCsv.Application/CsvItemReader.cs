@@ -1,24 +1,22 @@
-﻿using System.Globalization;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
-using ImportadorExcelCsv.Domain.Enums;
 using ImportadorExcelCsv.Domain.Interfaces;
-using ImportadorExcelCsv.Domain.ValueObjects;
-using ImportadorExcelCsv.Items;
+using ImportadorExcelCsv.Domain.Items;
+using System.Globalization;
 
 namespace ImportadorExcelCsv.Application;
 
 public class CsvItemReader : IItemReader
 {
-  public List<Item> Read(string filePath, bool hasHeader)
+  public List<RawItemRow> Read(string filePath, bool hasHeader)
   {
-    List<Item> items = [];
+    List<RawItemRow> rows = [];
     var config = new CsvConfiguration(CultureInfo.InvariantCulture)
     {
       Delimiter = ",",
       HasHeaderRecord = hasHeader
     };
-    
+
     using var reader = new StreamReader(filePath);
     using var csv = new CsvReader(reader, config);
 
@@ -27,26 +25,25 @@ public class CsvItemReader : IItemReader
       csv.Read();
       csv.ReadHeader();
     }
-    
+
+    int rowNumber = hasHeader ? 2 : 1;
+
     while (csv.Read())
     {
-      items.Add(GetItem(csv));
-    }
-    
-    return items;
-  }
+      rows.Add(new RawItemRow
+      {
+        RowNumber = rowNumber,
+        SKU = csv.GetField(0) ?? string.Empty,
+        Name = csv.GetField(1) ?? string.Empty,
+        Price = csv.GetField(2) ?? string.Empty,
+        Stock = csv.GetField(3) ?? string.Empty,
+        Category = csv.GetField(4) ?? string.Empty,
+        Active = csv.GetField(5) ?? string.Empty
+      });
 
-  private Item GetItem(CsvReader csv)
-  {
-    bool validCategory = Enum.TryParse(typeof(Category), csv.GetField("Categoria").Trim(), true, out var category);
-    return Item.Create
-    (
-      new SKU(csv.GetField("SKU").Trim()),
-      csv.GetField("Nombre").Trim(),
-      decimal.Parse(csv.GetField("Precio"), CultureInfo.InvariantCulture),
-      int.Parse(csv.GetField("Stock"), CultureInfo.InvariantCulture),
-      (Category)category,
-      bool.Parse(csv.GetField("Activo"))
-    );
+      rowNumber++;
+    }
+
+    return rows;
   }
 }

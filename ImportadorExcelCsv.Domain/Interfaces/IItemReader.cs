@@ -1,8 +1,8 @@
-using ImportadorExcelCsv.Items;
+using ImportadorExcelCsv.Domain.Items;
 
 namespace ImportadorExcelCsv.Domain.Interfaces;
 
 public interface IItemReader
 {
-  List<Item> Read(string filePath, bool hasHeader);
+  List<RawItemRow> Read(string filePath, bool hasHeader);
 }

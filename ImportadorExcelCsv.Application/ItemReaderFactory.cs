@@ -4,7 +4,7 @@ namespace ImportadorExcelCsv.Application;
 
 public class ItemReaderFactory : IItemReaderFactory
 {
-  public IItemReader Create(string fileName)
+  public IItemReader CreateItemFactory(string fileName)
   {
     string extension = Path.GetExtension(fileName);
 
