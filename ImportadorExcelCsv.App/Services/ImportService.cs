@@ -3,7 +3,7 @@ using ImportadorExcelCsv.Domain.Interfaces;
 using ImportadorExcelCsv.Domain.Items;
 using ImportadorExcelCsv.Items;
 
-namespace ImportadorExcelCsv.Application;
+namespace ImportadorExcelCsv.App.Services;
 
 public class ImportService : IImportService
 {

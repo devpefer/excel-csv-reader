@@ -1,6 +1,7 @@
+using ImportadorExcelCsv.App.Readers;
 using ImportadorExcelCsv.Domain.Interfaces;
 
-namespace ImportadorExcelCsv.Application;
+namespace ImportadorExcelCsv.App.Factory;
 
 public class ItemReaderFactory : IItemReaderFactory
 {

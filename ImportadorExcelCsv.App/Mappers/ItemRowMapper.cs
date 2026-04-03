@@ -5,7 +5,7 @@ using ImportadorExcelCsv.Domain.ValueObjects;
 using ImportadorExcelCsv.Items;
 using System.Globalization;
 
-namespace ImportadorExcelCsv.Application;
+namespace ImportadorExcelCsv.App.Mappers;
 
 public class ItemRowMapper : IItemRowMapper
 {
