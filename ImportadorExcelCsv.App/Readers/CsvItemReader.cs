@@ -13,7 +13,7 @@ public class CsvItemReader : IItemReader
     List<RawItemRow> rows = [];
     var config = new CsvConfiguration(CultureInfo.InvariantCulture)
     {
-      Delimiter = ",",
+      Delimiter = ";",
       HasHeaderRecord = hasHeader
     };
 
