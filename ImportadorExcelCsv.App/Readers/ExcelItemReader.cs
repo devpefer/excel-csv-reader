@@ -12,6 +12,7 @@ public class ExcelItemReader : IItemReader
     using XLWorkbook workbook = new XLWorkbook(filePath);
     IXLWorksheet worksheet = workbook.Worksheet(1);
     bool isFirstRow = true;
+    int rowNumber = hasHeader ? 2 : 1;
 
     foreach (IXLRow row in worksheet.RowsUsed())
     {
@@ -20,8 +21,6 @@ public class ExcelItemReader : IItemReader
         isFirstRow = false;
         continue;
       }
-
-      int rowNumber = hasHeader ? 2 : 1;
 
       rows.Add(new RawItemRow
       {
@@ -33,6 +32,8 @@ public class ExcelItemReader : IItemReader
         Category = row.Cell(5).GetValue<string>(),
         Active = row.Cell(6).GetValue<string>()
       });
+
+      rowNumber++;
     }
 
     return rows;

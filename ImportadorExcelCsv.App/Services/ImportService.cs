@@ -30,7 +30,21 @@ public class ImportService : IImportService
         try
         {
           Item item = _mapper.Map(rawRow);
+          if (result.Items.Any(i => i.SKU == item.SKU))
+          {
+            throw new ItemMappingException("SKU duplicado", rawRow.RowNumber, nameof(item.SKU), rawRow.SKU);
+          }
           result.Items.Add(item);
+        }
+        catch (ItemMappingException ex)
+        {
+          result.Errors.Add(new ImportError
+          {
+            RowNumber = ex.RowNumber,
+            Message = ex.Message,
+            FieldName = ex.FieldName,
+            RawValue = ex.RawValue
+          });
         }
         catch (ArgumentException ex)
         {

@@ -8,6 +8,8 @@ using ImportadorExcelCsv.App.Services;
 using ImportadorExcelCsv.Domain;
 using ImportadorExcelCsv.Domain.Interfaces;
 using ImportadorExcelCsv.Ui.Models;
+using ImportadorExcelCsv.Ui.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +20,7 @@ public partial class MainWindowViewModel : ObservableObject
 {
   private readonly IImportService _importService;
   private readonly TopLevel? _topLevel;
+  private readonly MessageBoxService _messageBoxService;
 
   [ObservableProperty]
   private string filePath = string.Empty;
@@ -44,6 +47,7 @@ public partial class MainWindowViewModel : ObservableObject
     IItemReaderFactory factory = new ItemReaderFactory();
     IItemRowMapper mapper = new ItemRowMapper();
     _importService = new ImportService(factory, mapper);
+    _messageBoxService = new MessageBoxService();
   }
 
   [RelayCommand]
@@ -71,42 +75,49 @@ public partial class MainWindowViewModel : ObservableObject
   }
 
   [RelayCommand]
-  private void Import()
+  private async Task Import()
   {
     if (string.IsNullOrWhiteSpace(FilePath))
       return;
 
-    ImportResult result = _importService.Read(FilePath, HasHeader);
-
-    Items.Clear();
-    Errors.Clear();
-
-    foreach (var item in result.Items)
+    try
     {
-      Items.Add(new ItemGridRow
-      {
-        SKU = item.SKU.Code,
-        Name = item.Name,
-        Price = item.Price,
-        Stock = item.Stock,
-        Category = item.Category.ToString(),
-        Active = item.Active
-      });
-    }
+      ImportResult result = _importService.Read(FilePath, HasHeader);
 
-    foreach (var error in result.Errors)
+      Items.Clear();
+      Errors.Clear();
+
+      foreach (var item in result.Items)
+      {
+        Items.Add(new ItemGridRow
+        {
+          SKU = item.SKU.Code,
+          Name = item.Name,
+          Price = item.Price,
+          Stock = item.Stock,
+          Category = item.Category.ToString(),
+          Active = item.Active
+        });
+      }
+
+      foreach (var error in result.Errors)
+      {
+        Errors.Add(new ImportErrorGridRow
+        {
+          RowNumber = error.RowNumber,
+          Message = error.Message,
+          FieldName = error.FieldName,
+          RawValue = error.RawValue
+        });
+      }
+
+      TotalRowsText = $"Total filas: {result.TotalRows}";
+      SuccessText = $"Válidas: {result.SuccesCount}";
+      ErrorText = $"Errores: {result.ErrorCount}";
+    }
+    catch (Exception ex)
     {
-      Errors.Add(new ImportErrorGridRow
-      {
-        RowNumber = error.RowNumber,
-        Message = error.Message,
-        FieldName = error.FieldName,
-        RawValue = error.RawValue
-      });
+      await _messageBoxService.ShowErrorAsync($"Ocurrió un error al importar el archivo: {ex.Message}");
     }
-
-    TotalRowsText = $"Total filas: {result.TotalRows}";
-    SuccessText = $"Válidas: {result.SuccesCount}";
-    ErrorText = $"Errores: {result.ErrorCount}";
   }
 }
