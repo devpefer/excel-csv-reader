@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ImportadorExcelCsv.Application/ImportadorExcelCsv.Application.csproj" Id="376733a1-5aed-4c97-95d7-b332ffc29e30" />
+  <Project Path="ImportadorExcelCsv.Domain/ImportadorExcelCsv.Domain.csproj" />
+  <Project Path="Test/Test.csproj" />
+</Solution>
