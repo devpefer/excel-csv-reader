@@ -1,0 +1,119 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ImportadorExcelCsv.Ui.ViewModels"
+    mc:Ignorable="d"
+    x:Class="ImportadorExcelCsv.Ui.Views.MainWindow"
+    Width="1200"
+    Height="760"
+    MinWidth="960"
+    MinHeight="620"
+    Title="Importador Excel/CSV"
+    x:DataType="vm:MainWindowViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,*" RowSpacing="12" Margin="16">
+
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+            <TextBox Grid.Column="0"
+                     Text="{Binding FilePath}"
+                     Watermark="Selecciona un archivo..."
+                     IsReadOnly="True"/>
+
+            <Button Grid.Column="1"
+                    Content="Seleccionar archivo"
+                    Command="{Binding BrowseCommand}"
+                    MinWidth="150"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Spacing="16">
+            <CheckBox Content="Tiene encabezado"
+                      IsChecked="{Binding HasHeader}"
+                      VerticalAlignment="Center"/>
+
+            <Button Content="Importar"
+                    Command="{Binding ImportCommand}"
+                    MinWidth="110"/>
+        </StackPanel>
+
+        <Border Grid.Row="2"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="#3A3A3A"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="24">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding TotalRowsText}"
+                           FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding SuccessText}"
+                           FontWeight="SemiBold"/>
+                <TextBlock Grid.Column="2"
+                           Text="{Binding ErrorText}"
+                           FontWeight="SemiBold"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="#3A3A3A"
+                BorderThickness="1">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+                <TextBlock Text="Items válidos"
+                           FontSize="18"
+                           FontWeight="Bold"/>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Items}"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="All"
+                          HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="140"/>
+                        <DataGridTextColumn Header="Nombre" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Precio" Binding="{Binding Price}" Width="110"/>
+                        <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="90"/>
+                        <DataGridTextColumn Header="Categoría" Binding="{Binding Category}" Width="160"/>
+                        <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Active}" Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="4"
+                Padding="12"
+                CornerRadius="8"
+                BorderBrush="#3A3A3A"
+                BorderThickness="1">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+                <TextBlock Text="Errores"
+                           FontSize="18"
+                           FontWeight="Bold"/>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Errors}"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          CanUserResizeColumns="True"
+                          CanUserSortColumns="True"
+                          GridLinesVisibility="All"
+                          HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Fila" Binding="{Binding RowNumber}" Width="90"/>
+                        <DataGridTextColumn Header="Mensaje" Binding="{Binding Message}" Width="*"/>
+                        <DataGridTextColumn Header="Campo" Binding="{Binding FieldName}" Width="140"/>
+                        <DataGridTextColumn Header="Valor" Binding="{Binding RawValue}" Width="180"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>

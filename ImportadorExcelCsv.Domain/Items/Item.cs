@@ -26,12 +26,12 @@ public class Item
   {
     if (string.IsNullOrWhiteSpace(name))
     {
-      throw new ArgumentNullException(nameof(name), "Name cannot be null or empty.");
+      throw new ArgumentNullException(nameof(name), "El nombre no puede estar vacío.");
     }
 
     if (price <= 0)
     {
-      throw new ArgumentOutOfRangeException(nameof(price), "Price cannot be less or equal to zero.");
+      throw new ArgumentOutOfRangeException(nameof(price), "El precio no puede ser 0 o negativo.");
     }
 
     return new Item(sku, name, price, stock, category, active);

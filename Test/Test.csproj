@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ImportadorExcelCsv.Application\ImportadorExcelCsv.Application.csproj" />
+    <ProjectReference Include="..\ImportadorExcelCsv.App\ImportadorExcelCsv.App.csproj" />
   </ItemGroup>
 
 </Project>

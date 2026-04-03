@@ -4,7 +4,7 @@ using ImportadorExcelCsv.Domain.Interfaces;
 using ImportadorExcelCsv.Domain.Items;
 using System.Globalization;
 
-namespace ImportadorExcelCsv.Application;
+namespace ImportadorExcelCsv.App.Readers;
 
 public class CsvItemReader : IItemReader
 {

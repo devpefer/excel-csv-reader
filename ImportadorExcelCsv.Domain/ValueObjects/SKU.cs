@@ -8,12 +8,12 @@ public record SKU
   {
     if (string.IsNullOrWhiteSpace(code))
     {
-      throw new ArgumentNullException("El código de SKU no puede ser nulo o vacío");
+      throw new ArgumentNullException(nameof(SKU), "El código de SKU no puede ser nulo o vacío");
     }
 
     if (code.Length != 8)
     {
-      throw new ArgumentException("El código de SKU debe tener exactamente 8 caracteres");
+      throw new ArgumentNullException(nameof(SKU), "El código de SKU debe tener exactamente 8 caracteres");
     }
 
     Code = code;
