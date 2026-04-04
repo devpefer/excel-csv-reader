@@ -5,9 +5,14 @@ namespace ImportadorExcelCsv.Ui.Views;
 
 public partial class MainWindow : Window
 {
-  public MainWindow()
+  public MainWindow(MainWindowViewModel viewModel)
   {
     InitializeComponent();
-    DataContext = new MainWindowViewModel(this);
+    DataContext = viewModel;
+
+    Opened += (_, _) =>
+    {
+      viewModel.SetTopLevel(this);
+    };
   }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ImportadorExcelCsv.Ui.Services
 {
-  internal class MessageBoxService
+  public class MessageBoxService
   {
     internal async Task ShowErrorAsync(string message)
     {

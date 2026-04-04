@@ -1,4 +1,4 @@
-﻿namespace ImportadorExcelCsv.Domain.Interfaces;
+﻿namespace ImportadorExcelCsv.Domain.Interfaces.Services;
 
 public interface IImportService
 {
