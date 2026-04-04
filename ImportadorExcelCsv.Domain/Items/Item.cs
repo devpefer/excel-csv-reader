@@ -1,4 +1,5 @@
-﻿using ImportadorExcelCsv.Domain.Enums;
+﻿using ImportadorExcelCsv.Domain;
+using ImportadorExcelCsv.Domain.Enums;
 using ImportadorExcelCsv.Domain.ValueObjects;
 
 namespace ImportadorExcelCsv.Items;
@@ -26,12 +27,17 @@ public class Item
   {
     if (string.IsNullOrWhiteSpace(name))
     {
-      throw new ArgumentNullException(nameof(name), "El nombre no puede estar vacío.");
+      throw new DomainValidationException(nameof(name), "El nombre no puede estar vacío.", name);
     }
 
     if (price <= 0)
     {
-      throw new ArgumentOutOfRangeException(nameof(price), "El precio no puede ser 0 o negativo.");
+      throw new DomainValidationException(nameof(price), "El precio no puede ser 0 o inferior.", price);
+    }
+
+    if (stock < 0)
+    {
+      throw new DomainValidationException(nameof(stock), "El stock no puede ser inferior a 0.", stock);
     }
 
     return new Item(sku, name, price, stock, category, active);

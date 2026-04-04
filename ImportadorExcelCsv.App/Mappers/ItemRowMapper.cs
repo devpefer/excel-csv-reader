@@ -53,13 +53,13 @@ public class ItemRowMapper : IItemRowMapper
           active
       );
     }
-    catch (ArgumentException ex)
+    catch (DomainValidationException ex)
     {
       throw ConvertDomainException(ex, row);
     }
   }
 
-  private static ItemMappingException ConvertDomainException(ArgumentException ex, RawItemRow row)
+  private static ItemMappingException ConvertDomainException(DomainValidationException ex, RawItemRow row)
   {
     return ex.ParamName?.ToLower() switch
     {
