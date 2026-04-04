@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using ImportadorExcelCsv.App;
 using ImportadorExcelCsv.Infrastructure;
+using ImportadorExcelCsv.Ui.Services;
 using ImportadorExcelCsv.Ui.ViewModels;
 using ImportadorExcelCsv.Ui.Views;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +39,7 @@ namespace ImportadorExcelCsv.Ui
 
               services.AddTransient<MainWindow>();
               services.AddTransient<MainWindowViewModel>();
+              services.AddSingleton<MessageBoxService>();
             });
 
     public static AppBuilder BuildAvaloniaApp()

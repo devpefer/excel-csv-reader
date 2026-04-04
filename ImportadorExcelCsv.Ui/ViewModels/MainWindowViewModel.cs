@@ -2,14 +2,13 @@
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ImportadorExcelCsv.App.Factory;
-using ImportadorExcelCsv.App.Mappers;
-using ImportadorExcelCsv.App.Services;
 using ImportadorExcelCsv.Domain;
-using ImportadorExcelCsv.Domain.Interfaces;
+using ImportadorExcelCsv.Domain.Interfaces.Services;
+using ImportadorExcelCsv.Items;
 using ImportadorExcelCsv.Ui.Models;
 using ImportadorExcelCsv.Ui.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,8 +18,11 @@ namespace ImportadorExcelCsv.Ui.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
   private readonly IImportService _importService;
-  private readonly TopLevel? _topLevel;
+  private readonly ICatalogService _catalogService;
   private readonly MessageBoxService _messageBoxService;
+
+  private TopLevel? _topLevel;
+  private List<Item> _importedItems = [];
 
   [ObservableProperty]
   private string filePath = string.Empty;
@@ -37,24 +39,35 @@ public partial class MainWindowViewModel : ObservableObject
   [ObservableProperty]
   private string errorText = "Errores: 0";
 
+  [ObservableProperty]
+  private string statusMessage = "Listo.";
+
   public ObservableCollection<ItemGridRow> Items { get; } = [];
   public ObservableCollection<ImportErrorGridRow> Errors { get; } = [];
 
-  public MainWindowViewModel(TopLevel? topLevel = null)
+  public MainWindowViewModel(
+      IImportService importService,
+      ICatalogService catalogService,
+      MessageBoxService messageBoxService)
+  {
+    _importService = importService;
+    _catalogService = catalogService;
+    _messageBoxService = messageBoxService;
+  }
+
+  public void SetTopLevel(TopLevel topLevel)
   {
     _topLevel = topLevel;
-
-    IItemReaderFactory factory = new ItemReaderFactory();
-    IItemRowMapper mapper = new ItemRowMapper();
-    _importService = new ImportService(factory, mapper);
-    _messageBoxService = new MessageBoxService();
   }
 
   [RelayCommand]
   private async Task Browse()
   {
     if (_topLevel is null)
+    {
+      await _messageBoxService.ShowErrorAsync("La ventana principal no está inicializada.");
       return;
+    }
 
     var files = await _topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
     {
@@ -78,46 +91,129 @@ public partial class MainWindowViewModel : ObservableObject
   private async Task Import()
   {
     if (string.IsNullOrWhiteSpace(FilePath))
+    {
+      await _messageBoxService.ShowErrorAsync("Debes seleccionar un archivo.");
       return;
+    }
 
     try
     {
       ImportResult result = _importService.Read(FilePath, HasHeader);
 
-      Items.Clear();
-      Errors.Clear();
+      _importedItems = result.Items.ToList();
 
-      foreach (var item in result.Items)
-      {
-        Items.Add(new ItemGridRow
-        {
-          SKU = item.SKU.Code,
-          Name = item.Name,
-          Price = item.Price,
-          Stock = item.Stock,
-          Category = item.Category.ToString(),
-          Active = item.Active
-        });
-      }
-
-      foreach (var error in result.Errors)
-      {
-        Errors.Add(new ImportErrorGridRow
-        {
-          RowNumber = error.RowNumber,
-          Message = error.Message,
-          FieldName = error.FieldName,
-          RawValue = error.RawValue
-        });
-      }
+      RefreshItemsGrid(result.Items);
+      RefreshErrorsGrid(result.Errors);
 
       TotalRowsText = $"Total filas: {result.TotalRows}";
       SuccessText = $"Válidas: {result.SuccesCount}";
       ErrorText = $"Errores: {result.ErrorCount}";
+      StatusMessage = "Importación realizada. Los datos todavía no se han guardado en la base de datos.";
     }
     catch (Exception ex)
     {
       await _messageBoxService.ShowErrorAsync($"Ocurrió un error al importar el archivo: {ex.Message}");
+    }
+  }
+
+  [RelayCommand]
+  private async Task SaveToDatabase()
+  {
+    if (_importedItems.Count == 0)
+    {
+      await _messageBoxService.ShowErrorAsync("No hay items importados para guardar.");
+      return;
+    }
+
+    try
+    {
+      foreach (var item in _importedItems)
+      {
+        await _catalogService.AddItemAsync(
+            item.SKU,
+            item.Name,
+            item.Price,
+            item.Stock,
+            item.Category,
+            item.Active);
+      }
+
+      StatusMessage = $"Se guardaron {_importedItems.Count} items en la base de datos.";
+    }
+    catch (Exception ex)
+    {
+      await _messageBoxService.ShowErrorAsync($"Ocurrió un error al guardar en la base de datos: {ex.Message}");
+    }
+  }
+
+  [RelayCommand]
+  private async Task LoadFromDatabase()
+  {
+    try
+    {
+      var items = await _catalogService.GetAllItemsAsync();
+
+      _importedItems = items.ToList();
+
+      RefreshItemsGrid(items);
+      Errors.Clear();
+
+      TotalRowsText = $"Total filas: {items.Count}";
+      SuccessText = $"Válidas: {items.Count}";
+      ErrorText = "Errores: 0";
+      StatusMessage = "Items cargados desde la base de datos.";
+    }
+    catch (Exception ex)
+    {
+      await _messageBoxService.ShowErrorAsync($"Ocurrió un error al recuperar los datos: {ex.Message}");
+    }
+  }
+
+  [RelayCommand]
+  private void Clear()
+  {
+    _importedItems.Clear();
+    Items.Clear();
+    Errors.Clear();
+
+    FilePath = string.Empty;
+    TotalRowsText = "Total filas: 0";
+    SuccessText = "Válidas: 0";
+    ErrorText = "Errores: 0";
+    StatusMessage = "Datos limpiados.";
+  }
+
+  private void RefreshItemsGrid(IEnumerable<Item> items)
+  {
+    Items.Clear();
+
+    foreach (var item in items)
+    {
+      Items.Add(new ItemGridRow
+      {
+        SKU = item.SKU.Code,
+        Name = item.Name,
+        Price = item.Price,
+        Stock = item.Stock,
+        Category = item.Category.ToString(),
+        Active = item.Active
+      });
+    }
+  }
+
+  private void RefreshErrorsGrid(IEnumerable<ImportError> errors)
+  {
+    Errors.Clear();
+
+    foreach (var error in errors)
+    {
+      Errors.Add(new ImportErrorGridRow
+      {
+        RowNumber = error.RowNumber,
+        Message = error.Message,
+        FieldName = error.FieldName,
+        RawValue = error.RawValue
+      });
     }
   }
 }

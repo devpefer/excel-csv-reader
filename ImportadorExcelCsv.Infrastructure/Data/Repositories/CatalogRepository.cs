@@ -5,26 +5,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ImportadorExcelCsv.Infrastructure.Data.Repositories;
 
-public class ItemRepository : IItemRepository
+public class CatalogRepository : ICatalogRepository
 {
   private readonly ImportadorExcelCsvDbContext _context;
 
-  public ItemRepository(ImportadorExcelCsvDbContext context)
+  public CatalogRepository(ImportadorExcelCsvDbContext context)
   {
     _context = context;
   }
 
-  public async Task<Item?> GetByIdAsync(SKU sku)
+  public async Task<Item?> GetBySkuAsync(SKU sku)
   {
     return await _context.Items.FindAsync(sku);
   }
 
-  public async Task<List<Item>> GetAllAsync()
+  public async Task<List<Item>> GetAllItemsAsync()
   {
     return await _context.Items.ToListAsync();
   }
 
-  public async Task AddAsync(Item entity)
+  public async Task AddItemAsync(Item entity)
   {
     await _context.Items.AddAsync(entity);
   }

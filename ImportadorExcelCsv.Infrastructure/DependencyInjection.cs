@@ -17,7 +17,7 @@ public static class DependencyInjection
     services.AddDbContext<ImportadorExcelCsvDbContext>(options =>
         options.UseSqlServer(connectionString));
 
-    services.AddScoped<IItemRepository, ItemRepository>();
+    services.AddScoped<ICatalogRepository, CatalogRepository>();
 
     return services;
   }

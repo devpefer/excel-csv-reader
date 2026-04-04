@@ -3,11 +3,11 @@ using ImportadorExcelCsv.Items;
 
 namespace ImportadorExcelCsv.Domain.Interfaces.Repositories
 {
-  public interface IItemRepository
+  public interface ICatalogRepository
   {
-    Task<Item?> GetByIdAsync(SKU sku);
-    Task<List<Item>> GetAllAsync();
-    Task AddAsync(Item item);
+    Task<Item?> GetBySkuAsync(SKU sku);
+    Task<List<Item>> GetAllItemsAsync();
+    Task AddItemAsync(Item item);
     void Update(Item entity);
     void Remove(Item entity);
     Task SaveChangesAsync();
