@@ -13,6 +13,8 @@ public class Item
   public Category Category { get; private set; }
   public bool Active { get; private set; }
 
+  private Item() { }
+
   private Item(SKU sku, string name, decimal price, int stock, Category category, bool active)
   {
     SKU = sku;

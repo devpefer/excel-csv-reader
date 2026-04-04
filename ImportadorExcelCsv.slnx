@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="ImportadorExcelCsv.App/ImportadorExcelCsv.App.csproj" />
   <Project Path="ImportadorExcelCsv.Domain/ImportadorExcelCsv.Domain.csproj" />
+  <Project Path="ImportadorExcelCsv.Infrastructure/ImportadorExcelCsv.Infrastructure.csproj" Id="1c6395ae-5740-4ede-96b5-d5ddb94f539f" />
   <Project Path="ImportadorExcelCsv.Ui/ImportadorExcelCsv.Ui.csproj" Id="97a610d3-220a-4a69-be05-810e955fc304" />
 </Solution>
