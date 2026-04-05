@@ -3,6 +3,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ImportadorExcelCsv.Domain;
+using ImportadorExcelCsv.Domain.Enums;
 using ImportadorExcelCsv.Domain.Interfaces.Services;
 using ImportadorExcelCsv.Items;
 using ImportadorExcelCsv.Ui.Models;
@@ -25,6 +26,7 @@ public partial class MainWindowViewModel : ObservableObject
 
   private TopLevel? _topLevel;
   private List<Item> _importedItems = [];
+  private List<Item> _updatedItems = [];
 
   [ObservableProperty]
   private string filePath = string.Empty;
@@ -138,45 +140,60 @@ public partial class MainWindowViewModel : ObservableObject
       return;
     }
 
-    var vm = new EditItemWindowViewModel
+    var vm = new EditItemWindowViewModel();
+    vm.Initialize(
+        row.SKU,
+        row.Name,
+        row.Price.ToString(CultureInfo.CurrentCulture),
+        row.Stock.ToString(),
+        row.Category,
+        row.Active);
+
+    vm.OnUpdated = async editVm =>
     {
-      Sku = row.SKU,
-      Name = row.Name,
-      Price = row.Price.ToString(CultureInfo.InvariantCulture),
-      Stock = row.Stock.ToString(),
-      Category = row.Category,
-      Active = row.Active
-    };
-
-    vm.OnUpdated = editVm =>
-    {
-      if (!decimal.TryParse(editVm.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal parsedPrice) &&
-          !decimal.TryParse(editVm.Price, NumberStyles.Any, CultureInfo.CurrentCulture, out parsedPrice))
+      if (editVm.WasUpdated)
       {
-        throw new InvalidOperationException("El precio no es válido.");
+        try
+        {
+          if (!decimal.TryParse(editVm.Price, NumberStyles.Number, CultureInfo.CurrentCulture, out decimal parsedPrice))
+          {
+            throw new InvalidOperationException("El precio no es válido.");
+          }
+
+          if (!int.TryParse(editVm.Stock, out int parsedStock))
+          {
+            throw new InvalidOperationException("El stock no es válido.");
+          }
+
+          if (!Enum.TryParse(editVm.Category, out Category parsedCategory))
+          {
+            throw new InvalidOperationException("El stock no es válido.");
+          }
+
+          item.UpdateBasicInfo(
+              editVm.Sku,
+              editVm.Name,
+              parsedPrice,
+              parsedStock,
+              parsedCategory,
+              editVm.Active);
+
+          row.SKU = editVm.Sku;
+          row.Name = editVm.Name;
+          row.Price = parsedPrice;
+          row.Stock = parsedStock;
+          row.Category = editVm.Category;
+          row.Active = editVm.Active;
+
+          StatusMessage = $"Item {row.SKU} actualizado en memoria.";
+
+          _updatedItems.Add(item);
+        }
+        catch (Exception ex)
+        {
+          await _messageBoxService.ShowErrorAsync($"Ocurrió un error al actualizar el item: {ex.Message}");
+        }
       }
-
-      if (!int.TryParse(editVm.Stock, out int parsedStock))
-      {
-        throw new InvalidOperationException("El stock no es válido.");
-      }
-
-      item.UpdateBasicInfo(
-          editVm.Sku,
-          editVm.Name,
-          parsedPrice,
-          parsedStock,
-          editVm.Category,
-          editVm.Active);
-
-      row.SKU = editVm.Sku;
-      row.Name = editVm.Name;
-      row.Price = parsedPrice;
-      row.Stock = parsedStock;
-      row.Category = editVm.Category;
-      row.Active = editVm.Active;
-
-      StatusMessage = $"Item {row.SKU} actualizado en memoria.";
     };
 
     var window = new EditItemWindow
@@ -215,6 +232,19 @@ public partial class MainWindowViewModel : ObservableObject
             item.Category,
             item.Active);
       }
+
+      foreach (var item in _updatedItems)
+      {
+        await _catalogService.UpdateItemAsync(
+            item.SKU,
+            item.Name,
+            item.Price,
+            item.Stock,
+            item.Category,
+            item.Active);
+      }
+
+      _updatedItems.Clear();
 
       StatusMessage = $"Se guardaron {_importedItems.Count} items en la base de datos.";
     }

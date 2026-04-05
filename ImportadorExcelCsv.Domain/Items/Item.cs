@@ -29,6 +29,29 @@ public class Item
 
   public static Item Create(SKU sku, string name, decimal price, int stock, Category category, bool active)
   {
+    return new Item(sku, name, price, stock, category, active);
+  }
+
+  public void UpdateBasicInfo(
+    SKU sku,
+    string name,
+    decimal price,
+    int stock,
+    Category category,
+    bool active)
+  {
+
+
+    SKU = new SKU(sku);
+    Name = name;
+    Price = price;
+    Stock = stock;
+    Category = category;
+    Active = active;
+  }
+
+  private void ValidateItem(SKU sku, string name, decimal price, int stock, Category category, bool active)
+  {
     if (string.IsNullOrWhiteSpace(name))
     {
       throw new DomainValidationException(nameof(name), "El nombre no puede estar vacío.", name);
@@ -43,23 +66,5 @@ public class Item
     {
       throw new DomainValidationException(nameof(stock), "El stock no puede ser inferior a 0.", stock);
     }
-
-    return new Item(sku, name, price, stock, category, active);
-  }
-
-  public void UpdateBasicInfo(
-    string sku,
-    string name,
-    decimal price,
-    int stock,
-    string category,
-    bool active)
-  {
-    SKU = new SKU(sku);
-    Name = name;
-    Price = price;
-    Stock = stock;
-    Category = Enum.Parse<Category>(category);
-    Active = active;
   }
 }
