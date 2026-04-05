@@ -9,4 +9,5 @@ public interface ICatalogService
   Task<List<Item>> GetAllItemsAsync();
   Task<Item> GetItemBySkuAsync(SKU sku);
   Task AddItemAsync(SKU sku, string name, decimal price, int stock, Category category, bool active);
+  Task UpdateItemAsync(SKU sku, string name, decimal price, int stock, Category category, bool active);
 }

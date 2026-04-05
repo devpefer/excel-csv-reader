@@ -7,9 +7,11 @@ using ImportadorExcelCsv.Domain.Interfaces.Services;
 using ImportadorExcelCsv.Items;
 using ImportadorExcelCsv.Ui.Models;
 using ImportadorExcelCsv.Ui.Services;
+using ImportadorExcelCsv.Ui.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -113,6 +115,82 @@ public partial class MainWindowViewModel : ObservableObject
     catch (Exception ex)
     {
       await _messageBoxService.ShowErrorAsync($"Ocurrió un error al importar el archivo: {ex.Message}");
+    }
+  }
+
+  [RelayCommand]
+  private async Task EditItem(ItemGridRow? row)
+  {
+    if (row is null)
+      return;
+
+    if (_topLevel is null)
+    {
+      await _messageBoxService.ShowErrorAsync("La ventana principal no está inicializada.");
+      return;
+    }
+
+    var item = _importedItems.FirstOrDefault(x => x.SKU.Code == row.SKU);
+
+    if (item is null)
+    {
+      await _messageBoxService.ShowErrorAsync("No se encontró el item seleccionado.");
+      return;
+    }
+
+    var vm = new EditItemWindowViewModel
+    {
+      Sku = row.SKU,
+      Name = row.Name,
+      Price = row.Price.ToString(CultureInfo.InvariantCulture),
+      Stock = row.Stock.ToString(),
+      Category = row.Category,
+      Active = row.Active
+    };
+
+    vm.OnUpdated = editVm =>
+    {
+      if (!decimal.TryParse(editVm.Price, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal parsedPrice) &&
+          !decimal.TryParse(editVm.Price, NumberStyles.Any, CultureInfo.CurrentCulture, out parsedPrice))
+      {
+        throw new InvalidOperationException("El precio no es válido.");
+      }
+
+      if (!int.TryParse(editVm.Stock, out int parsedStock))
+      {
+        throw new InvalidOperationException("El stock no es válido.");
+      }
+
+      item.UpdateBasicInfo(
+          editVm.Sku,
+          editVm.Name,
+          parsedPrice,
+          parsedStock,
+          editVm.Category,
+          editVm.Active);
+
+      row.SKU = editVm.Sku;
+      row.Name = editVm.Name;
+      row.Price = parsedPrice;
+      row.Stock = parsedStock;
+      row.Category = editVm.Category;
+      row.Active = editVm.Active;
+
+      StatusMessage = $"Item {row.SKU} actualizado en memoria.";
+    };
+
+    var window = new EditItemWindow
+    {
+      DataContext = vm
+    };
+
+    try
+    {
+      await window.ShowDialog((Window)_topLevel);
+    }
+    catch (Exception ex)
+    {
+      await _messageBoxService.ShowErrorAsync($"Ocurrió un error al editar el item: {ex.Message}");
     }
   }
 

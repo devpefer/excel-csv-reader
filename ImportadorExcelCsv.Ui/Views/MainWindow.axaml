@@ -103,6 +103,15 @@
                         <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="90"/>
                         <DataGridTextColumn Header="Categoría" Binding="{Binding Category}" Width="160"/>
                         <DataGridCheckBoxColumn Header="Activo" Binding="{Binding Active}" Width="90"/>
+                        <DataGridTemplateColumn Header="Acciones" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Editar"
+                                  Command="{Binding $parent[Window].DataContext.EditItemCommand}"
+                                  CommandParameter="{Binding}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

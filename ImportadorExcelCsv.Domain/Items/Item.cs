@@ -46,4 +46,20 @@ public class Item
 
     return new Item(sku, name, price, stock, category, active);
   }
+
+  public void UpdateBasicInfo(
+    string sku,
+    string name,
+    decimal price,
+    int stock,
+    string category,
+    bool active)
+  {
+    SKU = new SKU(sku);
+    Name = name;
+    Price = price;
+    Stock = stock;
+    Category = Enum.Parse<Category>(category);
+    Active = active;
+  }
 }

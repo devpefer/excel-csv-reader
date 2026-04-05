@@ -14,6 +14,11 @@ public class CatalogRepository : ICatalogRepository
     _context = context;
   }
 
+  public async Task<bool> ExistsBySkuAsync(SKU sku)
+  {
+    return await _context.Items.AnyAsync(i => i.SKU == sku);
+  }
+
   public async Task<Item?> GetBySkuAsync(SKU sku)
   {
     return await _context.Items.FindAsync(sku);

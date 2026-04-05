@@ -1,11 +1,24 @@
-﻿namespace ImportadorExcelCsv.Ui.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class ItemGridRow
+namespace ImportadorExcelCsv.Ui.Models;
+
+public partial class ItemGridRow : ObservableObject
 {
-  public string SKU { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public decimal Price { get; set; }
-  public int Stock { get; set; }
-  public string Category { get; set; } = string.Empty;
-  public bool Active { get; set; }
+  [ObservableProperty]
+  private string sKU = string.Empty;
+
+  [ObservableProperty]
+  private string name = string.Empty;
+
+  [ObservableProperty]
+  private decimal price;
+
+  [ObservableProperty]
+  private int stock;
+
+  [ObservableProperty]
+  private string category = string.Empty;
+
+  [ObservableProperty]
+  private bool active;
 }

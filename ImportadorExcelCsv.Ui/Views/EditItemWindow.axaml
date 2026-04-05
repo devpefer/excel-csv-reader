@@ -1,0 +1,62 @@
+<Window
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ImportadorExcelCsv.Ui.ViewModels"
+    mc:Ignorable="d"
+    x:Class="ImportadorExcelCsv.Ui.Views.EditItemWindow"
+    x:DataType="vm:EditItemWindowViewModel"
+    Width="520"
+    Height="500"
+    MinWidth="480"
+    MinHeight="460"
+    WindowStartupLocation="CenterOwner"
+    Title="Editar item">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20" RowSpacing="16">
+
+        <TextBlock Text="Editar item"
+                   FontSize="22"
+                   FontWeight="Bold"/>
+
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+              ColumnDefinitions="120,*"
+              RowSpacing="12"
+              ColumnSpacing="12">
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="SKU" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Sku}" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Nombre" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Precio" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Price}" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Stock" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Stock}" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Categoría" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Category}" />
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Activo" VerticalAlignment="Center"/>
+            <CheckBox Grid.Row="5" Grid.Column="1"
+                      IsChecked="{Binding Active}"
+                      VerticalAlignment="Center"/>
+        </Grid>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="12">
+            <Button Content="Actualizar"
+                    Command="{Binding UpdateCommand}"
+                    MinWidth="120"/>
+            <Button Content="Salir"
+                    Command="{Binding ExitCommand}"
+                    MinWidth="100"/>
+        </StackPanel>
+    </Grid>
+</Window>
